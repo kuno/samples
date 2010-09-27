@@ -1,0 +1,24 @@
+# Uncomment beneth line, when in git.
+# syntax: glob
+bin/*
+lib/*
+lib64
+include/*
+
+*~
+*.swp
+*.swc
+
+*.pyc
+
+*.db
+database
+*.database
+
+*.jpg
+*.jpeg
+*.png
+*.gif
+
+
+
