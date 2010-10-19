@@ -1,8 +1,7 @@
+# Image
 *.xcf binary
 *.xcf diff=exif
-
 *.png binary
 *.png diff=exif
-
 *.jpeg binary
 *.jpeg diff=exif

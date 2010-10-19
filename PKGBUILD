@@ -1,4 +1,4 @@
-intainer: Your Name <youremail at domain dot com>
+#maintainer: Your Name <youremail at domain dot com>
 
 pkgname=NAME
 pkgver=VERSION
