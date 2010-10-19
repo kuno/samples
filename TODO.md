@@ -1,12 +1,15 @@
 <style>
+li {
+}
 em {
 text-decoration: line-through;
 }
 strong {
-color: black;
+color: #ff80b2;
 }
 </style>
 ###{DATE}###
-* _{TASK 1}_
-* __{TASK 2}__
+* _{FINISHED TASK}_
+*   {NORMAL TASK}
+* __{EMERGENCY TASK}__
 * .......
