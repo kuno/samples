@@ -19,13 +19,13 @@ from perference import *
 # Project settings
 #==============================================================================
 # Project souce code repository
-PROJECT_CODENAME = 'angelica'
+PROJECT_CODENAME = ''
 
 #
-REMOTE_HOST = 'ursongae.appspot.com'
+REMOTE_HOST = ''
 
 #
-LOCALE_HOST = '127.2.0.1:8080'
+LOCALE_HOST = ''
 
 # Project directory
 PROJECT_DIR = os.path.dirname(__file__)
@@ -39,8 +39,15 @@ PERFERENCE_FILE = os.path.join(os.path.dirname(__file__), 'perference.py')
 # Javascript file dir
 JS_DIR = os.path.join(os.path.dirname(__file__), 'static/js')
 
+# CSS files didr
+
+CSS_DIR = os.path.join(os.path.dirname(__file__), 'static/css')
+
 # Javascript compiler
-JS_COMPILER = 'closure-compiler.appspot.com'
+GOOGLE_CLOSURE_COMPILER = 'closure-compiler.appspot.com'
+
+# Yahoo! User Interface compressor
+YUI_COMPRESSOR = 'yuicompressor'
 
 #==============================================================================
 # Inner functions
@@ -57,7 +64,7 @@ def _optimize_code(javascript_code):
         ])
     # Always use the following value for the Content-type header.
     headers = { "Content-type": "application/x-www-form-urlencoded" }
-    conn = httplib.HTTPConnection(JS_COMPILER)
+    conn = httplib.HTTPConnection(GOOGLE_CLOSURE_COMPILER)
     conn.request('POST', '/compile', params, headers)
     response = conn.getresponse()
     new_code = response.read()
@@ -90,23 +97,45 @@ def compact():
     """
     Compact the javascript code.
     """
-    files = os.listdir(JS_DIR)
-    for f in files:
+    js_files = os.listdir(JS_DIR)
+    css_files = os.listdir(CSS_DIR)
+
+    # Compress javascript code
+    for f in js_files:
         if not f.startswith('.') and f.split('.')[-1] == 'js':
             local("cp %s/%s %s/%s" % (JS_DIR, f, JS_DIR, '.'+f))
-            _replace_code(f)
+            local("yuicompressor %s/%s --type js -o %s/%s" % 
+                    (JS_DIR, '.'+f, JS_DIR, f))
         else:
             pass
+
+    # Compress css code
+    for f in css_files:
+        if not f.startswith('.') and f.split('.')[-1] == 'css':
+            local("cp %s/%s %s/%s" % (CSS_DIR, f, CSS_DIR, '.'+f))
+            local("yuicompressor %s/%s --type css -o %s/%s" % 
+                    (CSS_DIR, '.'+f, CSS_DIR, f))
+        else:
+            pass     
 
 
 def decompact():
     """
     Reverse of previous task.
     """
-    files = os.listdir(JS_DIR)
-    for f in files:
+    js_files = os.listdir(JS_DIR)
+    css_files = os.listdir(CSS_DIR)
+
+    # Recover js files
+    for f in js_files:
         if f.startswith('.') and f.split('.')[-1] == 'js':
             local("cp %s/%s %s/%s" % (JS_DIR, f, JS_DIR, f.lstrip('.')))
+        else:
+            pass
+    # Recover css files
+    for f in css_files:
+        if f.startswith('.') and f.split('.')[-1] == 'css':
+            local("cp %s/%s %s/%s" % (CSS_DIR, f, CSS_DIR, f.lstrip('.')))
         else:
             pass
 
