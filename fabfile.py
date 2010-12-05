@@ -16,16 +16,16 @@ from datetime import date
 
 from perference import *
 #==============================================================================
-# Project settings
+# Project profiles
 #==============================================================================
 # Project souce code repository
-PROJECT_CODENAME = {}
+PROJECT_CODENAME = 
 
 #
-REMOTE_HOST = {}
+REMOTE_HOST = 
 
 #
-LOCALE_HOST = {}
+LOCALE_HOST = 
 
 # Project directory
 PROJECT_DIR = os.path.dirname(__file__)
@@ -39,47 +39,13 @@ JS_DIR = os.path.join(os.path.dirname(__file__), 'static/js')
 # CSS files dir
 CSS_DIR = os.path.join(os.path.dirname(__file__), 'static/css')
 
-# Google closure javascript compiler
-GOOGLE_CLOSURE_COMPILER = 'closure-compiler.appspot.com'
-
-# Yahool YUI compressor
-YUI_COMPRESSOR  = 'yuicompressor'   
 
 #==============================================================================
 # Inner functions
 #==============================================================================
-def _compress_Js_code(javascript_code):
-    """
-    Compress javascript code for better performance.
-    """
-    params = urllib.urlencode([
-        ('js_code', javascript_code),
-        ('compilation_level', 'WHITESPACE_ONLY'),
-        ('output_format', 'text'),
-        ('output_info', 'compiled_code'),
-        ])
-    # Always use the following value for the Content-type header.
-    headers = { "Content-type": "application/x-www-form-urlencoded" }
-    conn = httplib.HTTPConnection(GOOGLE_CLOSURE_COMPILER)
-    conn.request('POST', '/compile', params, headers)
-    response = conn.getresponse()
-    new_code = response.read()
-
-    return new_code
-
-
-def _replace_js_file(javascript_file):
-    """
-    Replace old, un-optimized js file with the compressed file.
-    """
-    path = os.path.join(JS_DIR, javascript_file)
-    old_code = open(path, 'r').read()
-    new_code = _compress_js_code(old_code)
-
-    f = open(path, 'w+')
-    f.write(new_code)
-    f.close()
-
+#
+#
+#
 #==============================================================================
 # Tasks
 #==============================================================================

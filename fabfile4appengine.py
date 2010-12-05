@@ -43,46 +43,8 @@ JS_DIR = os.path.join(os.path.dirname(__file__), 'static/js')
 
 CSS_DIR = os.path.join(os.path.dirname(__file__), 'static/css')
 
-# Javascript compiler
-GOOGLE_CLOSURE_COMPILER = 'closure-compiler.appspot.com'
-
-# Yahoo! User Interface compressor
-YUI_COMPRESSOR = 'yuicompressor'
-
-#==============================================================================
-# Inner functions
-#==============================================================================
-def _optimize_code(javascript_code):
-    """
-    Opitimize javascript code before publishing to the wild.
-    """
-    params = urllib.urlencode([
-        ('js_code', javascript_code),
-        ('compilation_level', 'WHITESPACE_ONLY'),
-        ('output_format', 'text'),
-        ('output_info', 'compiled_code'),
-        ])
-    # Always use the following value for the Content-type header.
-    headers = { "Content-type": "application/x-www-form-urlencoded" }
-    conn = httplib.HTTPConnection(GOOGLE_CLOSURE_COMPILER)
-    conn.request('POST', '/compile', params, headers)
-    response = conn.getresponse()
-    new_code = response.read()
-
-    return new_code
-
-
-def _replace_code(javascript_file):
-    """
-    Replace old, un-optimized js code with the  optimized code.
-    """
-    path = os.path.join(JS_DIR, javascript_file)
-    old_code = open(path, 'r').read()
-    new_code = _optimize_code(old_code)
-
-    f = open(path, 'w+')
-    f.write(new_code)
-    f.close()
+# Choose javascript code comppler 
+JS_COMPILER = '
 
 #==============================================================================
 # Tasks
