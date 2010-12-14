@@ -31,3 +31,10 @@ fabfile.*
 
 # binary data file
 *.dat
+
+# hidden files
+.*
+
+# minified files
+*.min.js
+*.min.css
