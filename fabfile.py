@@ -6,10 +6,15 @@
 # appcfg.py command line tool.
 #
 
-import os
+
 import urllib
 import httplib
-import os.path
+
+import os.walk
+
+from os.path import join
+from os.path import dirname
+from os.path import basename
 
 from fabric.api import *
 from datetime import date
@@ -19,6 +24,9 @@ from perference import *
 #==============================================================================
 # Project profiles
 #==============================================================================
+# Appengine ID
+ID = ''
+
 # Project souce code repository
 CODENAME = ''
 
@@ -29,22 +37,22 @@ REMOTE_HOST = ''
 LOCALE_HOST = ''
 
 # Project directory
-PROJECT_DIR = os.path.dirname(__file__)
+PROJECT_DIR = dirname(__file__)
 
 # Setting file
-PERFERENCE_FILE = os.path.join(os.path.dirname(__file__), '')
+PERFERENCE_FILE = join(dirname(__file__), '')
 
 # Template file
-BASE_LAYER = os.path.join(os.path.dirname(__file__), '')
+BASE_LAYER = join(dirname(__file__), '')
 
 # Index script
-INDEX_SCRIPT = os.path.join(os.path.dirname(__file__), '')
+INDEX_SCRIPT = join(dirname(__file__), '')
 
 # Javascript file dir
-JS_DIR = os.path.join(os.path.dirname(__file__), '')
+JS_DIR = join(dirname(__file__), '')
 
 # CSS files dir
-CSS_DIR = os.path.join(os.path.dirname(__file__), '')
+CSS_DIR = join(dirname(__file__), '')
 
 # specified javascript code compressor
 JS_COMPILER = 'google'
@@ -52,18 +60,20 @@ JS_COMPILER = 'google'
 #==============================================================================
 # Inner functions
 #==============================================================================
-def _list_files(dir):
+def _list_files(root):
     """
     Filter directory for lists.
     """
-    files = []
-    for f in os.listdir(dir):
-        if os.path.isfile(os.path.join(dir, f)):
-            files.append(f)
-        else:
-            pass
+    file_list = []
+    for parent, subdirs, files in os.walk(root):
+        for f in files:
+            if not f.startswith('.'):
+                p = join(parent, f)
+                file_list.append(p)
+            else:
+                pass
 
-    return files
+    return file_list
 
 #==============================================================================
 # Tasks
@@ -82,23 +92,27 @@ def compact():
     css_files = _list_files(CSS_DIR)
 
     # Compress javascript code
-    for f in js_files:
-        if not f.startswith('.') and not f.split('.')[-2] = 'min' and f.split('.')[-1] == 'js':
+    for p in js_files:
+        f = basename(p)
+        n = f.split('.')
+        if len(n) >= 2 and n[-1] == 'js' and not n[-2] = 'min':
             if JS_COMPILER == 'yahoo':
-                local("yuicompressor %s/%s --type js -o %s/%s" % 
-                        (JS_DIR, f, JS_DIR, f.split('.')[0] + '.min.js'))
+                local("yuicompressor %s --type js -o %s" % 
+                        (p, join(dirname(f),(n[0] + '.min.js')))
             else # use google closure
-                local("closure --js %s/%s --js_output_file %s/%s" % 
-                        (JS_DIR, f, JS_DIR, f.split('.')[0] + '.min.js'))
+                local("closure --js %s --js_output_file %s" % 
+                        (p, join(dirname(f),(n[0] + '.min.js')))
         else:
             pass
 
     # Compress css code
     # Warning: MAY demage the code 
-    for f in css_files:
-        if not f.startswith('.') and not f.split('.')[-2] == 'min' and f.split('.')[-1] == 'css':
-            local("yuicompressor %s/%s --type css -o %s/%s" % 
-                    (CSS_DIR, f, CSS_DIR, f.split('.')[0] + '.min.css'))
+    for p in css_files:
+        f = basename(p)
+        n = f.split('.')
+        if len(n) >= 2 and n[-1] == 'css' and not n[-2] == 'min':
+            local("yuicompressor %s --type css -o %s" % 
+                    (p, join(dirname(f),(n('.')[0] + '.min.css')))
         else:
             pass     
 
@@ -171,6 +185,12 @@ def rollback():
     Rollback the previous update.
     """
     local("appcfg.py rollback %s" % PROJECT_DIR)
+
+def downloadapp():
+    """
+    Download source code from google appengine.
+    """
+    local("appcfy.py --email=neokuno@gmail.com --passin update download_app -A %s %s" % (ID, PROJECT_DIR)
 
 
 def start():

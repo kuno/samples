@@ -19,6 +19,8 @@ include/*
 *.db
 database
 *.database
+*.datastore
+*.blobstore
 
 # binary image files
 *.jpg
