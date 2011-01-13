@@ -10,8 +10,7 @@
 import urllib
 import httplib
 
-import os.walk
-
+from os import walk
 from os.path import join
 from os.path import dirname
 from os.path import basename
@@ -95,13 +94,13 @@ def compact():
     for p in js_files:
         f = basename(p)
         n = f.split('.')
-        if len(n) >= 2 and n[-1] == 'js' and not n[-2] = 'min':
+        if len(n) >= 2 and n[-1] == 'js' and not n[-2] == 'min':
             if JS_COMPILER == 'yahoo':
                 local("yuicompressor %s --type js -o %s" % 
-                        (p, join(dirname(f),(n[0] + '.min.js')))
-            else # use google closure
+                        (p, join(dirname(p),(n[0] + '.min.js'))))
+            else: # use google closure
                 local("closure --js %s --js_output_file %s" % 
-                        (p, join(dirname(f),(n[0] + '.min.js')))
+                        (p, join(dirname(p),(n[0] + '.min.js'))))
         else:
             pass
 
@@ -112,7 +111,7 @@ def compact():
         n = f.split('.')
         if len(n) >= 2 and n[-1] == 'css' and not n[-2] == 'min':
             local("yuicompressor %s --type css -o %s" % 
-                    (p, join(dirname(f),(n('.')[0] + '.min.css')))
+                    (p, join(dirname(p),(n[0] + '.min.css'))))
         else:
             pass     
 
@@ -155,7 +154,7 @@ def i18nize():
     """
     host = "\"http:\/\/" + REMOTE_HOST + "\""
     local("sed -i -e 's/lapi/ajax\.googleapis\.com/' %s " % BASE_LAYER)
-    local("sed -i -e 's/^HOST = .*/HOST = %s' %s" % (host, PERFERENCE_FILE))
+    local("sed -i -e 's/^HOST\ =\ .*/HOST\ =\ %s/g' %s" % (host, PERFERENCE_FILE))
     debugoff()
 
 
@@ -185,12 +184,13 @@ def rollback():
     Rollback the previous update.
     """
     local("appcfg.py rollback %s" % PROJECT_DIR)
+    localize()
 
 def downloadapp():
     """
     Download source code from google appengine.
     """
-    local("appcfy.py --email=neokuno@gmail.com --passin update download_app -A %s %s" % (ID, PROJECT_DIR)
+    local("appcfy.py --email=neokuno@gmail.com --passin update download_app -A %s %s" % (ID, PROJECT_DIR))
 
 
 def start():
