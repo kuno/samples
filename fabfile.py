@@ -5,8 +5,7 @@
 # wrapping the google appengine sdk
 # appcfg.py command line tool.
 #
-
-
+import os
 import urllib
 import httplib
 
@@ -17,8 +16,6 @@ from os.path import basename
 
 from fabric.api import *
 from datetime import date
-
-from perference import *
 
 #==============================================================================
 # Project profiles
@@ -53,9 +50,15 @@ JS_DIR = join(dirname(__file__), '')
 # CSS files dir
 CSS_DIR = join(dirname(__file__), '')
 
+# CSS files that should not be minimized
+CSS_IGNORE_LIST = ['']
+
 # specified javascript code compressor
 JS_COMPILER = 'google'
 
+# JS files that should not be minimized
+# if 'all', ignore all js files
+JS_IGNORE_LIST = 'all'
 #==============================================================================
 # Inner functions
 #==============================================================================
@@ -77,6 +80,22 @@ def _list_files(root):
 #==============================================================================
 # Tasks
 #==============================================================================
+def whatis(target):
+    """
+    What is what?
+    """
+    if target == 'id':
+        print('ID is '+ID);
+    elif target == 'codename':
+        print('Codename is '+CODENAME)
+    elif target == 'remote':
+        print('Remote host is '+REMOTE_HOST)
+    elif target == 'local':
+        print('Local host is '+LOCALE_HOST)
+    else:
+        pass
+
+
 def doctest():
     """
     Do local test.
@@ -91,29 +110,33 @@ def compact():
     css_files = _list_files(CSS_DIR)
 
     # Compress javascript code
-    for p in js_files:
-        f = basename(p)
-        n = f.split('.')
-        if len(n) >= 2 and n[-1] == 'js' and not n[-2] == 'min':
-            if JS_COMPILER == 'yahoo':
-                local("yuicompressor %s --type js -o %s" % 
+    if JS_IGNORE_LIST is not 'all':
+        for p in js_files:
+            f = basename(p)
+            if f not in JS_IGNORE_LIST:
+                n = f.split('.')
+                if len(n) >= 2 and n[-1] == 'js' and not n[-2] == 'min':
+                    if JS_COMPILER == 'yahoo':
+                        local("yuicompressor %s --type js -o %s" % 
                         (p, join(dirname(p),(n[0] + '.min.js'))))
-            else: # use google closure
-                local("closure --js %s --js_output_file %s" % 
+                    else: # use google closure
+                        local("closure --js %s --js_output_file %s" % 
                         (p, join(dirname(p),(n[0] + '.min.js'))))
-        else:
-            pass
+                else:
+                    pass
 
     # Compress css code
-    # Warning: MAY demage the code 
-    for p in css_files:
-        f = basename(p)
-        n = f.split('.')
-        if len(n) >= 2 and n[-1] == 'css' and not n[-2] == 'min':
-            local("yuicompressor %s --type css -o %s" % 
-                    (p, join(dirname(p),(n[0] + '.min.css'))))
-        else:
-            pass     
+    # Warning: MAY demage the code
+    if CSS_IGNORE_LIST is not 'all':
+        for p in css_files:
+            f = basename(p)
+            if f not in CSS_IGNORE_LIST:
+                n = f.split('.')
+                if len(n) >= 2 and n[-1] == 'css' and not n[-2] == 'min':
+                    local("yuicompressor %s --type css -o %s" % 
+                        (p, join(dirname(p),(n[0] + '.min.css'))))
+                else:
+                    pass     
 
 
 def replace():
@@ -170,8 +193,8 @@ def tag():
             (reversion, PERFERENCE_FILE))
 
 
-def update():
-    """
+    def update():
+        """
     Upload the application.
     """
     i18nize()
